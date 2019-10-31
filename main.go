@@ -10,29 +10,24 @@ import (
 
 func main() {
 
-	c := struct {
-		HttpAddr string
-	}{
-		HttpAddr: ":8000", // Default http address
+	// Default config
+	c := Config{
+		HTTPAddr: ":8000",
 	}
 
+	// Populate configuration
 	goconfig.Read(&c)
 
-	b := box.NewBox()
+	// Build box API
+	b := BuildAPI()
 
-	b.Resource("/hello").
-		WithActions(
-			box.Get(func() string {
-				return "Hello world!"
-			}),
-		)
-
+	// Setup server
 	s := &http.Server{
-		Addr:    c.HttpAddr,
+		Addr:    c.HTTPAddr,
 		Handler: box.Box2Http(b),
 	}
 
+	// Run server
 	fmt.Println("Listening to ", s.Addr)
-
 	s.ListenAndServe()
 }
