@@ -1,25 +1,44 @@
 package articles
 
 import (
-	"blogotech/helpers"
-	"blogotech/testutils"
 	"context"
 	"testing"
 
 	"github.com/fulldump/box"
+	"github.com/globalsign/mgo/bson"
+	"github.com/google/uuid"
+
+	"blogotech/helpers"
+	"blogotech/mongo"
+	"blogotech/testutils"
 )
 
 func TestGetArticle(t *testing.T) {
 
-	ctx := context.Background()
+	t.Parallel()
 
+	s, _ := mongo.NewSession("mongodb://localhost:27017/blogotech-test-" + uuid.New().String())
+	defer s.DB("").DropDatabase()
+
+	// Create article:
+	s.DB("").C(collection).Insert(bson.M{
+		"_id":   "my id",
+		"title": "my title",
+		"body":  "my body",
+	})
+
+	// Run test
+	ctx := context.Background()
+	ctx = mongo.SetSession(ctx, s)
 	ctx = helpers.SetBoxContext(ctx, &box.C{
 		Parameters: map[string]string{
-			"articleId": "77",
+			"articleId": "my id",
 		},
 	})
 
-	result := GetArticle(ctx)
+	article, err := GetArticle(ctx)
 
-	testutils.AssertEqual(t, result, "this is the article 77")
+	testutils.AssertNil(t, err)
+	testutils.AssertEqual(t, article.Title, "my title")
+	testutils.AssertEqual(t, article.Body, "my body")
 }

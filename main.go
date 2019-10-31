@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/fulldump/box"
 	"github.com/fulldump/goconfig"
+
+	"blogotech/mongo"
 )
 
 func main() {
@@ -18,8 +21,15 @@ func main() {
 	// Populate configuration
 	goconfig.Read(&c)
 
+	// Connect to mongo
+	m, err := mongo.NewSession("mongodb://localhost:27017/blogotech")
+	if err != nil {
+		fmt.Printf("fail connecting to mongo: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// Build box API
-	b := BuildAPI()
+	b := BuildAPI(m)
 
 	// Setup server
 	s := &http.Server{
