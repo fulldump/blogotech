@@ -1,2 +1,4 @@
 github.com/fulldump/box v0.0.2 h1:Ha/LREZ1G7gPUfOZKCO4vz2DFvrNeNLX3KDaa+NCjfs=
 github.com/fulldump/box v0.0.2/go.mod h1:UO8uDIKLNvnsp/ru2za7gev9VBlRIeAVH3bLl7xdfNg=
+github.com/fulldump/goconfig v1.5.0 h1:YMTkg0F1BGxTOWbyn0/vOQfoULZ/vDrBfiDPajR+SVs=
+github.com/fulldump/goconfig v1.5.0/go.mod h1:lOEl7YJDeKsAM/CnKUV0vnmDt5ZhHBuqFT/9SdQjWKo=
