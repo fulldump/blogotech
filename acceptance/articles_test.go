@@ -5,60 +5,51 @@ import (
 	"testing"
 
 	"github.com/fulldump/apitest"
-	"github.com/fulldump/box"
 
-	"blogotech/api"
-	"blogotech/mongo"
 	"blogotech/testutils"
 )
 
 func TestArticles(t *testing.T) {
 
-	// Fake config:
-	//c := config.Config{} // lets move config to its own package
+	articleID := ""
 
-	// Connect to mongo
-	m, err := mongo.NewSession("mongodb://localhost:27017/blogotech-acceptance")
-	testutils.AssertNil(t, err)
-	m.DB("").DropDatabase() // free resources
+	Environment(func(s *apitest.Apitest) {
+		// #1 Create a new article
+		r := s.Request("POST", "/api/v0/articles").WithBodyString(`
+			{
+				"title": "my-title",
+				"body": "my-body"
+			}
+		`).Do()
 
-	// Build API
-	b := api.BuildAPI(m) // Lets move api to its own package...
+		b := *r.BodyJsonMap()
+		testutils.AssertEqual(t, b["title"], "my-title")
+		testutils.AssertEqual(t, b["body"], "my-body")
 
-	s := apitest.NewWithHandler(box.Box2Http(b))
-	defer s.Destroy() // free resources
+		articleID = b["id"].(string)
 
-	// At this point we need to do a standard http request...
+	}, func(s *apitest.Apitest) {
 
-	// now... a simple use case:
-	// #1 Create a new article
-	res1 := s.Request("POST", "/api/v0/articles").WithBodyString(`
-		{
-			"title": "my-title",
-			"body": "my-body"
-		}
-	`).Do()
+		// #2 Get that article by id
+		r := s.Request("GET", "/api/v0/articles/"+articleID).Do()
 
-	body1 := *res1.BodyJsonMap()
-	testutils.AssertEqual(t, body1["title"], "my-title")
-	testutils.AssertEqual(t, body1["body"], "my-body")
+		b := *r.BodyJsonMap()
+		testutils.AssertEqual(t, b["id"], articleID)
+		testutils.AssertEqual(t, b["title"], "my-title")
+		testutils.AssertEqual(t, b["body"], "my-body")
 
-	articleID := body1["id"].(string)
+	}, func(s *apitest.Apitest) {
 
-	// #2 Get that article by id
-	res2 := s.Request("GET", "/api/v0/articles/"+articleID).Do()
+		// #3 Delete article
+		r := s.Request("DELETE", "/api/v0/articles/"+articleID).Do()
+		testutils.AssertEqual(t, r.StatusCode, http.StatusOK)
 
-	body2 := *res2.BodyJsonMap()
-	testutils.AssertEqual(t, body2["id"], articleID)
-	testutils.AssertEqual(t, body2["title"], "my-title")
-	testutils.AssertEqual(t, body2["body"], "my-body")
+	}, func(s *apitest.Apitest) {
 
-	// #3 Delete article
-	res3 := s.Request("DELETE", "/api/v0/articles/"+articleID).Do()
-	testutils.AssertEqual(t, res3.StatusCode, http.StatusOK)
+		// #4 Try to get that article
+		r := s.Request("GET", "/api/v0/articles/"+articleID).Do()
+		testutils.AssertEqual(t, r.StatusCode, http.StatusNotFound)
 
-	// #4 Try to get that article
-	res4 := s.Request("GET", "/api/v0/articles/"+articleID).Do()
-	testutils.AssertEqual(t, res4.StatusCode, http.StatusNotFound)
+	})
 
 }
