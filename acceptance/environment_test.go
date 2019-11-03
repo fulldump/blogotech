@@ -1,6 +1,8 @@
 package acceptance
 
 import (
+	"fmt"
+
 	"blogotech/api"
 	"blogotech/mongo"
 
@@ -12,9 +14,12 @@ import (
 func Environment(callbacks ...func(a *apitest.Apitest)) {
 
 	// Connect to mongo
-	mongoURI := "mongodb://localhost:27017/blogotech-acceptance-" + uuid.New().String()
-	m, _ := mongo.NewSession(mongoURI)
-	m.DB("").DropDatabase() // free resources
+	mongoURI := "mongodb://mongodb:27017,localhost:27017/blogotech-acceptance-" + uuid.New().String()
+	m, err := mongo.NewSession(mongoURI)
+	if err != nil {
+		fmt.Println("environment says:", err)
+	}
+	defer m.DB("").DropDatabase() // free resources
 
 	// Build API
 	b := api.BuildAPI(m) // Lets move api to its own package...

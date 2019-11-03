@@ -1,0 +1,29 @@
+version: '2'
+
+networks:
+  testnet:
+  default:
+    external:
+      name: "testnet"
+
+services:
+
+  mongodb:
+    image: "mongo:3.4.11"
+    expose:
+      - 27017
+    networks:
+      - testnet
+
+  app:
+    image: "golang:1.12"
+    volumes:
+      - .:/code
+    working_dir: /code
+    networks:
+      - testnet
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+

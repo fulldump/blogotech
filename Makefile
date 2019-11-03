@@ -11,3 +11,7 @@ build:
 
 deps:
 	go mod download
+
+docker-%:
+	docker-compose run --rm app make $*
+

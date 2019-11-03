@@ -17,7 +17,7 @@ func TestGetArticle(t *testing.T) {
 
 	t.Parallel()
 
-	s, _ := mongo.NewSession("mongodb://localhost:27017/blogotech-test-" + uuid.New().String())
+	s, _ := mongo.NewSession("mongodb://mongodb:27017,localhost:27017/blogotech-test-" + uuid.New().String())
 	defer s.DB("").DropDatabase()
 
 	// Create article:
