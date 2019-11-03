@@ -8,13 +8,15 @@ import (
 	"github.com/fulldump/box"
 	"github.com/fulldump/goconfig"
 
+	"blogotech/api"
+	"blogotech/config"
 	"blogotech/mongo"
 )
 
 func main() {
 
 	// Default config
-	c := Config{
+	c := config.Config{
 		HTTPAddr: ":8000",
 	}
 
@@ -29,7 +31,7 @@ func main() {
 	}
 
 	// Build box API
-	b := BuildAPI(m)
+	b := api.BuildAPI(m)
 
 	// Setup server
 	s := &http.Server{

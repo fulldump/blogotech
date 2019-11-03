@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/fulldump/box"
 )
@@ -30,4 +31,9 @@ func GetBoxContext(ctx context.Context) *box.C {
 	}
 
 	return c.(*box.C)
+}
+
+// GetResponse return current http response (from context)
+func GetResponse(ctx context.Context) http.ResponseWriter {
+	return GetBoxContext(ctx).Response
 }

@@ -1,4 +1,4 @@
-package main
+package config
 
 // Config is config!
 type Config struct {
