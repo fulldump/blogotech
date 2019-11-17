@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/fulldump/box"
 	"github.com/globalsign/mgo"
 
@@ -9,7 +11,7 @@ import (
 )
 
 // BuildAPI return box Handler
-func BuildAPI(s *mgo.Session) *box.B {
+func BuildAPI(s *mgo.Session, statics string) *box.B {
 	b := box.NewBox()
 
 	v0 := b.Resource("/api/v0")
@@ -29,6 +31,13 @@ func BuildAPI(s *mgo.Session) *box.B {
 			box.Get(articles.GetArticle),
 			box.Delete(articles.DeleteArticle),
 			box.Patch(articles.UpdateArticle),
+		)
+
+	// The strategy: all endpoints different from implemented ones, will be
+	// treated as potential files.
+	b.Resource("*").
+		WithActions(
+			box.Get(http.FileServer(http.Dir(statics)).ServeHTTP),
 		)
 
 	return b

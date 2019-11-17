@@ -18,6 +18,7 @@ func main() {
 	// Default config
 	c := config.Config{
 		HTTPAddr: ":8000",
+		Statics:  "statics",
 	}
 
 	// Populate configuration
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	// Build box API
-	b := api.BuildAPI(m)
+	b := api.BuildAPI(m, c.Statics)
 
 	// Setup server
 	s := &http.Server{

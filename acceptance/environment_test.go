@@ -22,7 +22,7 @@ func Environment(callbacks ...func(a *apitest.Apitest)) {
 	defer m.DB("").DropDatabase() // free resources
 
 	// Build API
-	b := api.BuildAPI(m) // Lets move api to its own package...
+	b := api.BuildAPI(m, "statics") // Lets move api to its own package...
 
 	a := apitest.NewWithHandler(box.Box2Http(b))
 	defer a.Destroy() // free resources
